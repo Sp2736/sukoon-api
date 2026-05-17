@@ -1,26 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: "Google Sans Flex", system-ui, sans-serif;
+  --font-display: "Google Sans Flex", system-ui, sans-serif;
+
+  --color-brand: #0ea5e9; /* Sky 500 - matches the blue in logo */
+  --color-brand-light: #e0f2fe; /* Sky 100 */
+  --color-brand-dark: #0369a1; /* Sky 700 */
+  --color-stone-dark: #334155; /* Slate 700 - matches text in logo */
+  --color-bg-light: #f8fafc; /* Slate 50 */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    @apply font-sans bg-[--color-bg-light] text-stone-800;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Brand underline decoration */
+  .brand-underline {
+    @apply relative inline-block;
+  }
+
+  .brand-underline::after {
+    content: '';
+    @apply absolute left-0 -bottom-1 h-0.5 w-full bg-[--color-brand];
+  }
+
+  /* Card hover lift */
+  .card-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-lift:hover {
+    @apply -translate-y-1 shadow-xl;
+  }
 }
