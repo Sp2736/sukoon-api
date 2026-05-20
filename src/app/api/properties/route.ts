@@ -22,6 +22,7 @@ export async function GET(request: Request) {
         const maxPrice = searchParams.get('max_price');
         const configuration = searchParams.get('configuration'); // e.g., "3 BHK"
         const furnished = searchParams.get('furnished'); // Assuming mapped via description or custom field if added later
+        const excludeId = searchParams.get('exclude_id'); // catch the current open property
         
         // Sorting
         const sort = searchParams.get('sort') || 'latest'; // latest, price_asc, price_desc
@@ -43,6 +44,7 @@ export async function GET(request: Request) {
         if (maxPrice) query = query.lte('price', parseFloat(maxPrice));
         if (configuration) query = query.ilike('configuration', `%${configuration}%`);
         if (furnished) query = query.ilike('description', `%${furnished}%`); // Fallback text search for furnished
+        if (excludeId) query = query.neq('public_id', excludeId); // tell Supabase to exclude this ID
 
         // Apply Sorting
         switch (sort) {

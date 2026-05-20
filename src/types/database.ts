@@ -1,4 +1,4 @@
-export type PropertyCategory = 'Residential' | 'Commercial' | 'Agricultural Land' | 'Non-agricultural Land';
+export type PropertyCategory = 'Residential' | 'Industrial' | 'Commercial' | 'Agricultural Land' | 'Non-agricultural Land';
 
 export interface PropertyRow {
     id: string;

@@ -12,6 +12,7 @@ const CATEGORY_COLORS: Record<string, string> = {
     'Land': 'bg-stone-100 text-stone-700',
     'Residential': 'bg-blue-100 text-blue-700',
     'Commercial': 'bg-purple-100 text-purple-700',
+    'Industrial': 'bg-orange-100 text-orange-700',
 };
 
 function formatPrice(price: number): string {

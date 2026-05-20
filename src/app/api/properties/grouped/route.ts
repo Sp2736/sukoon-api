@@ -5,6 +5,7 @@ import type { PropertyCategory } from '@/types/database';
 
 const CATEGORIES: PropertyCategory[] = [
     'Residential',
+    'Industrial',
     'Commercial',
     'Agricultural Land',
     'Non-agricultural Land'

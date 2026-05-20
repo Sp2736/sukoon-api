@@ -4,7 +4,7 @@
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback } from 'react';
 
-const CATEGORIES = ['all', 'Land', 'Residential', 'Commercial'] as const;
+const CATEGORIES = ['all', 'Land', 'Residential', 'Commercial', 'Industrial'] as const;
 
 const PRICE_RANGES = [
     { label: 'Any Price', min: undefined, max: undefined },
