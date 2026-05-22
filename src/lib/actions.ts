@@ -3,8 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient, createServiceClient } from '@/supabase/server';
-import { propertySchema, inquirySchema, loginSchema } from '@/lib/validations';
-import type { PropertyFormValues } from '@/lib/validations';
+import { propertySchema, inquirySchema, loginSchema, reviewSchema } from '@/lib/validations';
+import type { PropertyFormValues, ReviewFormValues } from '@/lib/validations';
 import type { PropertyRow } from '@/types/database';
 
 // ── Helper ────────────────────────────────────────────────────
@@ -292,5 +292,44 @@ export async function deleteTransactionAction(id: string) {
     if (error) return toActionError(error);
 
     revalidatePath('/admin/accounts');
+    return { success: true };
+}
+
+// ════════════════════════════════════════════════════════════
+// REVIEWS / TESTIMONIALS
+// ════════════════════════════════════════════════════════════
+
+export async function getReviewsAdmin() {
+    const supabase = await createServiceClient();
+    const { data, error } = await (supabase
+        .from('reviews') as any)
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return data ?? [];
+}
+
+export async function createReviewAction(values: ReviewFormValues) {
+    const supabase = await createServiceClient();
+    const parsed = reviewSchema.safeParse(values);
+    if (!parsed.success) return toActionError(parsed.error.issues[0].message);
+
+    const { error } = await (supabase.from('reviews') as any).insert({
+        ...parsed.data,
+    });
+
+    if (error) return toActionError(error);
+
+    revalidatePath('/admin/testimonials');
+    return { success: true };
+}
+
+export async function deleteReviewAction(id: string) {
+    const supabase = await createServiceClient();
+    const { error } = await (supabase.from('reviews') as any).delete().eq('id', id);
+    if (error) return toActionError(error);
+
+    revalidatePath('/admin/testimonials');
     return { success: true };
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { transactionSchema, type TransactionFormValues } from '@/lib/validations';
@@ -18,9 +18,14 @@ export default function TransactionForm() {
             type: 'credit',
             title: '',
             amount: '',
-            date: new Date().toISOString().split('T')[0],
+            date: '',
         }
     });
+
+    // Set today's date on client only to avoid hydration mismatch
+    useEffect(() => {
+        setValue('date', new Date().toISOString().split('T')[0]);
+    }, [setValue]);
 
     const activeType = watch('type');
 

@@ -52,6 +52,15 @@ export interface TransactionRow {
     created_at: string;
 }
 
+export interface ReviewRow {
+    id: string;
+    name: string;
+    role: string;
+    quote: string;
+    avatar_url: string | null;
+    created_at: string;
+}
+
 // ── Enriched / joined types ───────────────────────────────────
 
 export interface PropertyWithImages extends PropertyRow {
@@ -201,6 +210,26 @@ export type Database = {
                         referencedColumns: ["id"];
                     }
                 ];
+            };
+            reviews: {
+                Row: ReviewRow;
+                Insert: {
+                    id?: string;
+                    name: string;
+                    role: string;
+                    quote: string;
+                    avatar_url?: string | null;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    name?: string;
+                    role?: string;
+                    quote?: string;
+                    avatar_url?: string | null;
+                    created_at?: string;
+                };
+                Relationships: [];
             };
         };
         Views: {

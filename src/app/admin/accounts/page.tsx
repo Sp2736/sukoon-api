@@ -2,6 +2,7 @@ import { getTransactionsAdmin } from '@/lib/actions';
 import TransactionForm from '@/components/TransactionForm';
 import DeleteTransactionButton from '@/components/DeleteTransactionButton';
 import type { Metadata } from 'next';
+import { Info } from 'lucide-react';
 import { TransactionRow } from '@/types/database';
 
 export const metadata: Metadata = { title: 'Accounts & Ledger' };
@@ -125,7 +126,20 @@ export default async function AccountsPage() {
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-2 h-2 rounded-full ${t.type === 'credit' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]'}`}></div>
-                                                        <span className="text-sm font-bold text-stone-800">{t.title}</span>
+                                                        <span className="text-sm font-bold text-stone-800">
+                                                            {t.title.length > 30 ? t.title.slice(0, 30) + '...' : t.title}
+                                                        </span>
+                                                        {t.title.length > 30 && (
+                                                            <div className="relative group/tip">
+                                                                <Info size={15} className="text-stone-400 hover:text-stone-600 cursor-pointer transition-colors flex-shrink-0" />
+                                                                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/tip:block z-50 w-max max-w-xs">
+                                                                    <div className="bg-stone-800 text-white text-xs rounded-md px-3 py-2 shadow-lg font-medium leading-relaxed">
+                                                                        {t.title}
+                                                                    </div>
+                                                                    <div className="w-2 h-2 bg-stone-800 rotate-45 mx-auto -mt-1"></div>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5 whitespace-nowrap">

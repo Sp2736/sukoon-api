@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-// import { getTestimonialsAdmin } from '@/lib/actions'; // Add this to your actions later
+import { getReviewsAdmin } from '@/lib/actions';
+import DeleteButton from '@/components/DeleteTestimonialButton';
 
 export const metadata: Metadata = { title: 'Testimonials - Admin' };
 
 export default async function TestimonialsPage() {
-    // const testimonials = await getTestimonialsAdmin();
-    const testimonials: any[] = []; // Placeholder until backend is wired
+    const testimonials = await getReviewsAdmin();
 
     return (
         <div className="max-w-5xl mx-auto p-4 md:p-6 lg:p-10 space-y-6 md:space-y-10">
@@ -22,7 +22,7 @@ export default async function TestimonialsPage() {
                 </div>
                 <Link
                     href="/admin/testimonials/new"
-                    className="w-full sm:w-auto bg-brand hover:bg-brand-light text-white px-6 py-3 rounded-lg font-bold shadow-sm transition-colors text-sm"
+                    className="w-full sm:w-auto bg-brand hover:bg-brand-light text-white px-6 py-3 rounded-lg font-bold shadow-sm transition-colors text-sm text-center"
                 >
                     + Add New Review
                 </Link>
@@ -53,14 +53,14 @@ export default async function TestimonialsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-stone-100">
-                                {testimonials.map((t) => (
+                                {testimonials.map((t: any) => (
                                     <tr key={t.id} className="hover:bg-stone-50 transition-colors group">
                                         <td className="px-6 py-4 flex items-center gap-3">
                                             {t.avatar_url ? (
                                                 <img src={t.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover border border-stone-200" />
                                             ) : (
-                                                <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-stone-500">
-                                                    {t.name.charAt(0)}
+                                                <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-stone-500 uppercase">
+                                                    {t.name ? t.name.charAt(0) : "?"}
                                                 </div>
                                             )}
                                             <span className="font-bold text-stone-800 text-sm">{t.name}</span>
@@ -73,10 +73,12 @@ export default async function TestimonialsPage() {
                                         <td className="px-6 py-4">
                                             <p className="text-xs text-stone-500 line-clamp-2">{t.quote}</p>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-3 items-center">
                                                 <button className="text-stone-400 hover:text-brand text-xs font-bold transition-colors">Edit</button>
-                                                <button className="text-red-400 hover:text-red-600 text-xs font-bold transition-colors">Delete</button>
+
+                                                {/* Replaced form with clean interactive Client Button */}
+                                                <DeleteButton id={t.id} />
                                             </div>
                                         </td>
                                     </tr>

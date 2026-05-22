@@ -87,3 +87,13 @@ export const transactionSchema = z.object({
 });
 
 export type TransactionFormValues = z.infer<typeof transactionSchema>;
+
+// ── Reviews / Testimonials ───────────────────────────────────
+
+export const reviewSchema = z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters').max(100),
+    role: z.string().min(2, 'Role must be at least 2 characters').max(100),
+    quote: z.string().min(10, 'Quote must be at least 10 characters').max(2000),
+});
+
+export type ReviewFormValues = z.infer<typeof reviewSchema>;
