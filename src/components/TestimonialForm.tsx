@@ -107,41 +107,6 @@ export default function TestimonialForm() {
                         </div>
                     </section>
                 </div>
-
-                {/* RIGHT COLUMN - Avatar Upload */}
-                <div className="md:col-span-4 space-y-8">
-                    <section className="bg-white rounded-xl border border-stone-200 shadow-sm p-6">
-                        <h2 className="text-sm font-bold text-stone-900 mb-4 pb-4 border-b border-stone-100">Avatar Image (Optional)</h2>
-                        
-                        <div className="space-y-4">
-                            {/* We limit this to 1 file for avatars */}
-                            <ImageUpload 
-                                files={pendingFiles} 
-                                onFilesChange={(newFiles) => setPendingFiles(newFiles.slice(0, 1))} 
-                            />
-                            
-                            {pendingFiles.length > 0 && (
-                                <div className="relative aspect-square w-full max-w-[200px] mx-auto rounded-full overflow-hidden border-4 border-stone-100 shadow-sm">
-                                    <img 
-                                        src={URL.createObjectURL(pendingFiles[0])} 
-                                        className="w-full h-full object-cover" 
-                                        alt="Avatar preview" 
-                                    />
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setPendingFiles([])}
-                                        className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            )}
-                            <p className="text-[10px] text-stone-500 text-center font-medium leading-relaxed">
-                                Recommended size: 100x100px.<br/>It will be cropped to a circle.
-                            </p>
-                        </div>
-                    </section>
-                </div>
             </div>
 
             {/* Mobile Floating Action Bar */}

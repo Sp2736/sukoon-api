@@ -32,6 +32,117 @@ const CATEGORIES = [
   "Non-agricultural Land",
 ] as const;
 
+// Custom Theme-Compliant Select Component
+function CustomSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  error,
+  disabled = false,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  options: { label: string; value: string }[] | readonly string[];
+  placeholder: string;
+  error?: boolean;
+  disabled?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        className={`flex items-center justify-between w-full rounded-lg border px-4 py-3 text-sm transition-all focus:outline-none ${
+          error
+            ? "border-red-500 bg-red-50 ring-2 ring-red-200"
+            : isOpen
+              ? "border-brand ring-2 ring-brand/20 bg-white"
+              : "border-stone-300 bg-white hover:border-stone-400"
+        } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      >
+        <span
+          className={value ? "text-stone-900 font-medium" : "text-stone-400"}
+        >
+          {value
+            ? (typeof options[0] === "string"
+                ? value
+                : (options as any[]).find((o) => o.value === value)?.label) ||
+              value
+            : placeholder}
+        </span>
+        <svg
+          className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${
+            isOpen ? "rotate-180 text-brand" : ""
+          }`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <>
+          {/* Invisible backdrop to close dropdown when clicking outside */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute z-50 w-full mt-1.5 bg-white border border-stone-200 rounded-lg shadow-xl max-h-60 overflow-y-auto custom-scrollbar transform opacity-100 scale-100 transition-all origin-top">
+            {options.map((opt) => {
+              const optValue = typeof opt === "string" ? opt : opt.value;
+              const optLabel = typeof opt === "string" ? opt : opt.label;
+              const isSelected = value === optValue;
+
+              return (
+                <button
+                  key={optValue}
+                  type="button"
+                  onClick={() => {
+                    onChange(optValue);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-brand/10 text-brand font-bold"
+                      : "text-stone-700 hover:bg-stone-50 hover:text-stone-900"
+                  }`}
+                >
+                  {optLabel}
+                  {isSelected && (
+                    <svg
+                      className="w-4 h-4 text-brand"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function PropertyForm({
   mode,
   property,
@@ -55,6 +166,7 @@ export default function PropertyForm({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema) as any,
@@ -68,7 +180,7 @@ export default function PropertyForm({
       area_unit: property?.area_unit ?? "sq. mtr",
       area_value: property?.area_value ? String(property.area_value) : "",
       survey_number: property?.survey_number ?? "",
-      category: (property?.category ?? "") as any, // Empty default to force selection
+      category: (property?.category ?? "") as any,
       configuration: property?.configuration ?? "",
       floor_number: property?.floor_number ?? "",
       room_size: property?.room_size ?? "",
@@ -81,9 +193,24 @@ export default function PropertyForm({
   });
 
   const selectedCategory = watch("category");
+  const selectedZoneType = watch("zone_type");
+  const selectedFencing = watch("fencing");
+  const selectedAreaUnit = watch("area_unit");
   const selectedRelatedProperties = (watch("related_properties" as any) ||
     []) as string[];
   const isRelatedPropertiesMaxed = selectedRelatedProperties.length >= 3;
+
+  // Controlled Checkbox Toggle Function to fix sync bugs
+  const handleToggleRelated = (propertyId: string) => {
+    let updated: string[];
+    if (selectedRelatedProperties.includes(propertyId)) {
+      updated = selectedRelatedProperties.filter((id) => id !== propertyId);
+    } else {
+      if (isRelatedPropertiesMaxed) return;
+      updated = [...selectedRelatedProperties, propertyId];
+    }
+    setValue("related_properties", updated, { shouldDirty: true });
+  };
 
   // Derived Properties for Selection
   const otherProperties = useMemo(
@@ -151,30 +278,30 @@ export default function PropertyForm({
         className="min-h-screen bg-stone-50 pb-32 font-sans text-stone-900"
       >
         {/* Header Strip */}
-        <div className="bg-white border-b border-stone-200 sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+        <div className="bg-white border-b border-stone-200 sticky top-0 z-30">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5 flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-stone-900">
+              <h1 className="text-xl md:text-2xl font-bold text-stone-900 line-clamp-1">
                 {mode === "create"
                   ? "Create New Property Listing"
                   : "Edit Property Details"}
               </h1>
-              <p className="text-sm text-stone-500 mt-1">
+              <p className="hidden md:block text-sm text-stone-500 mt-1">
                 Fill in the details below to structure your listing accurately.
               </p>
             </div>
-            <div className="hidden sm:flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4 shrink-0">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-2.5 text-sm font-bold text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors"
+                className="px-4 md:px-6 py-2.5 text-xs md:text-sm font-bold text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors"
               >
                 Discard
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-brand text-white px-8 py-2.5 rounded-lg font-bold text-sm shadow-sm hover:bg-brand-dark transition-colors disabled:opacity-50"
+                className="bg-brand text-white px-6 md:px-8 py-2.5 rounded-lg font-bold text-xs md:text-sm shadow-sm hover:bg-brand-light transition-colors disabled:opacity-50"
               >
                 {isSubmitting ? "Saving..." : "Save Listing"}
               </button>
@@ -183,7 +310,7 @@ export default function PropertyForm({
         </div>
 
         {/* Main Content Grid */}
-        <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT COLUMN (Wider) - Core Details & Media */}
           <div className="lg:col-span-8 space-y-8">
             {/* Section: Primary Information */}
@@ -209,19 +336,17 @@ export default function PropertyForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className={labelCls}>Asset Category *</label>
-                    <select
-                      {...register("category")}
-                      className={inputCls(!!errors.category)}
-                    >
-                      <option value="" disabled>
-                        Select a category...
-                      </option>
-                      {CATEGORIES.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
+                    <CustomSelect
+                      value={selectedCategory}
+                      onChange={(val) =>
+                        setValue("category", val as any, {
+                          shouldValidate: true,
+                        })
+                      }
+                      options={CATEGORIES}
+                      placeholder="Select a category..."
+                      error={!!(errors as any).category}
+                    />
                     {(errors as any).category && (
                       <p className="text-red-500 text-xs mt-1.5 font-medium">
                         {(errors as any).category.message}
@@ -293,23 +418,25 @@ export default function PropertyForm({
                     <>
                       <div>
                         <label className={labelCls}>Zone Type</label>
-                        <select
-                          {...register("zone_type" as any)}
-                          className={inputCls()}
-                        >
-                          <option value="Green">Green Zone</option>
-                          <option value="Yellow">Yellow Zone</option>
-                        </select>
+                        <CustomSelect
+                          value={selectedZoneType || ""}
+                          onChange={(val) =>
+                            setValue("zone_type", val, { shouldValidate: true })
+                          }
+                          options={["Green Zone", "Yellow Zone"]}
+                          placeholder="Select zone..."
+                        />
                       </div>
                       <div>
                         <label className={labelCls}>Fencing</label>
-                        <select
-                          {...register("fencing" as any)}
-                          className={inputCls()}
-                        >
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
+                        <CustomSelect
+                          value={selectedFencing || ""}
+                          onChange={(val) =>
+                            setValue("fencing", val, { shouldValidate: true })
+                          }
+                          options={["Yes", "No"]}
+                          placeholder="Select..."
+                        />
                       </div>
                     </>
                   )}
@@ -530,14 +657,23 @@ export default function PropertyForm({
                   </div>
                   <div>
                     <label className={labelCls}>Unit *</label>
-                    <select
-                      {...register("area_unit")}
-                      className={inputCls(!!errors.area_unit)}
-                    >
-                      <option value="sq. ft">Sq. ft</option>
-                      <option value="sq. mtr">Sq. mtr</option>
-                      <option value="Acre">Acre</option>
-                    </select>
+                    <CustomSelect
+                      value={selectedAreaUnit}
+                      onChange={(val) =>
+                        setValue(
+                          "area_unit",
+                          val as "sq. mtr" | "sq. ft" | "Acre",
+                          { shouldValidate: true },
+                        )
+                      }
+                      options={[
+                        { label: "Sq. ft", value: "sq. ft" },
+                        { label: "Sq. mtr", value: "sq. mtr" },
+                        { label: "Acre", value: "Acre" },
+                      ]}
+                      placeholder="Unit"
+                      error={!!(errors as any).area_unit}
+                    />
                   </div>
                 </div>
               </div>
@@ -573,7 +709,7 @@ export default function PropertyForm({
                     {selectedCategory} category.
                   </p>
 
-                  <div className="max-h-60 overflow-y-auto pr-2 space-y-2">
+                  <div className="max-h-60 overflow-y-auto custom-scrollbar pr-2 space-y-2">
                     {categoryFilteredProperties.map((p) => {
                       const isSelected = selectedRelatedProperties.includes(
                         p.id,
@@ -583,14 +719,19 @@ export default function PropertyForm({
                       return (
                         <label
                           key={p.id}
-                          className={`flex items-start gap-3 p-3 rounded-lg border ${isSelected ? "border-brand bg-brand/5" : "border-stone-200 hover:bg-stone-50"} ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                          className={`flex items-start gap-3 p-3 rounded-lg border ${
+                            isSelected
+                              ? "border-brand bg-brand/5"
+                              : "border-stone-200 hover:bg-stone-50"
+                          } ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                         >
+                          {/* CONTROLLED CHECKBOX */}
                           <input
                             type="checkbox"
-                            value={p.id}
-                            {...register("related_properties" as any)}
+                            checked={isSelected}
+                            onChange={() => handleToggleRelated(p.id)}
                             disabled={isDisabled}
-                            className="mt-0.5 accent-brand w-4 h-4 cursor-pointer"
+                            className="mt-0.5 accent-brand w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
                           />
                           <div className="flex flex-col min-w-0">
                             <span className="text-sm font-bold text-stone-800 line-clamp-1">
@@ -652,24 +793,6 @@ export default function PropertyForm({
             </section>
           </div>
         </div>
-
-        {/* Mobile Floating Action Bar */}
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 flex gap-4 z-40">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="flex-1 py-3 text-sm font-bold text-stone-600 bg-stone-100 rounded-lg"
-          >
-            Discard
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex-1 bg-brand text-white py-3 rounded-lg font-bold text-sm disabled:opacity-50"
-          >
-            {isSubmitting ? "Saving..." : "Save"}
-          </button>
-        </div>
       </form>
 
       {/* MODAL: Browse All Properties */}
@@ -710,7 +833,11 @@ export default function PropertyForm({
             <div className="px-6 py-3 border-b border-stone-100 bg-stone-50 flex flex-wrap gap-2">
               <button
                 onClick={() => setModalCategoryFilter("All")}
-                className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-colors ${modalCategoryFilter === "All" ? "bg-stone-800 text-white border-stone-800" : "bg-white text-stone-600 border-stone-200 hover:bg-stone-100"}`}
+                className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-colors ${
+                  modalCategoryFilter === "All"
+                    ? "bg-stone-800 text-white border-stone-800"
+                    : "bg-white text-stone-600 border-stone-200 hover:bg-stone-100"
+                }`}
               >
                 All
               </button>
@@ -718,7 +845,11 @@ export default function PropertyForm({
                 <button
                   key={cat}
                   onClick={() => setModalCategoryFilter(cat)}
-                  className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-colors ${modalCategoryFilter === cat ? "bg-stone-800 text-white border-stone-800" : "bg-white text-stone-600 border-stone-200 hover:bg-stone-100"}`}
+                  className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-colors ${
+                    modalCategoryFilter === cat
+                      ? "bg-stone-800 text-white border-stone-800"
+                      : "bg-white text-stone-600 border-stone-200 hover:bg-stone-100"
+                  }`}
                 >
                   {cat}
                 </button>
@@ -726,7 +857,7 @@ export default function PropertyForm({
             </div>
 
             {/* Modal List */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
               {modalFilteredProperties.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-stone-500 font-medium">
@@ -741,14 +872,19 @@ export default function PropertyForm({
                     return (
                       <label
                         key={`modal-${p.id}`}
-                        className={`flex items-start gap-4 p-4 rounded-xl border transition-all ${isSelected ? "border-brand bg-brand/5 shadow-sm" : "border-stone-200 hover:border-stone-300 bg-white"} ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                        className={`flex items-start gap-4 p-4 rounded-xl border transition-all ${
+                          isSelected
+                            ? "border-brand bg-brand/5 shadow-sm"
+                            : "border-stone-200 hover:border-stone-300 bg-white"
+                        } ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                       >
+                        {/* CONTROLLED CHECKBOX */}
                         <input
                           type="checkbox"
-                          value={p.id}
-                          {...register("related_properties" as any)}
+                          checked={isSelected}
+                          onChange={() => handleToggleRelated(p.id)}
                           disabled={isDisabled}
-                          className="mt-0.5 accent-brand w-5 h-5 cursor-pointer"
+                          className="mt-0.5 accent-brand w-5 h-5 cursor-pointer disabled:cursor-not-allowed"
                         />
                         <div className="flex flex-col min-w-0">
                           <span className="text-sm font-bold text-stone-900 line-clamp-1">
