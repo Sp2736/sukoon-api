@@ -1,5 +1,6 @@
 import { createClient } from "@/supabase/server";
 import Sidebar from "@/components/Sidebar";
+import AutoLogout from "@/components/AutoLogout"; // Import the new component
 
 export default async function AdminLayout({
   children,
@@ -11,14 +12,17 @@ export default async function AdminLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If there is no authenticated user, render the children directly (hides the sidebar on the login page)
+  // Unauthenticated users just see the login screen without the sidebar/timers
   if (!user) {
     return <>{children}</>;
   }
 
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col lg:flex-row font-sans text-stone-900">
-      {/* Navigation (Responsive) */}
+      {/* Invisible Session Monitor */}
+      <AutoLogout />
+
+      {/* Navigation */}
       <Sidebar userEmail={user?.email} />
 
       {/* Main content */}

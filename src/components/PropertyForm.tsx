@@ -258,11 +258,22 @@ export default function PropertyForm({
 
     const result =
       mode === "create"
-        ? await createPropertyAction(values, newImageUrls)
+        ? await createPropertyAction(propertyId, values, newImageUrls)
         : await updatePropertyAction(property!.id, values, newImageUrls);
 
     if ("error" in result) {
       setServerError(result.error);
+
+      // Rollback: remove freshly uploaded images from storage if the DB save fails
+      if (newImageUrls.length > 0) {
+        try {
+          await Promise.all(
+            newImageUrls.map((url) => deletePropertyImage(url)),
+          );
+        } catch (err) {
+          console.error("Failed to rollback uploaded images:", err);
+        }
+      }
       return;
     }
 
@@ -483,8 +494,6 @@ export default function PropertyForm({
                           if (confirm("Delete cover image?")) {
                             await deletePropertyImageAction(
                               existingImages[0].id,
-                            );
-                            await deletePropertyImage(
                               existingImages[0].image_url,
                             );
                             setExistingImages((prev) => prev.slice(1));
@@ -553,8 +562,10 @@ export default function PropertyForm({
                               type="button"
                               onClick={async () => {
                                 if (confirm("Delete this image?")) {
-                                  await deletePropertyImageAction(img.id);
-                                  await deletePropertyImage(img.image_url);
+                                  await deletePropertyImageAction(
+                                    img.id,
+                                    img.image_url,
+                                  );
                                   setExistingImages((prev) =>
                                     prev.filter((i) => i.id !== img.id),
                                   );

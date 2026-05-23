@@ -20,12 +20,12 @@ export async function GET(request: Request) {
         const city = searchParams.get('city');
         const minPrice = searchParams.get('min_price');
         const maxPrice = searchParams.get('max_price');
-        const configuration = searchParams.get('configuration'); // e.g., "3 BHK"
-        const furnished = searchParams.get('furnished'); // Assuming mapped via description or custom field if added later
-        const excludeId = searchParams.get('exclude_id'); // catch the current open property
+        const configuration = searchParams.get('configuration'); 
+        const furnished = searchParams.get('furnished'); 
+        const excludeId = searchParams.get('exclude_id'); 
         
         // Sorting
-        const sort = searchParams.get('sort') || 'latest'; // latest, price_asc, price_desc
+        const sort = searchParams.get('sort') || 'latest'; 
 
         const supabase = await createServiceClient();
         
@@ -43,8 +43,8 @@ export async function GET(request: Request) {
         if (minPrice) query = query.gte('price', parseFloat(minPrice));
         if (maxPrice) query = query.lte('price', parseFloat(maxPrice));
         if (configuration) query = query.ilike('configuration', `%${configuration}%`);
-        if (furnished) query = query.ilike('description', `%${furnished}%`); // Fallback text search for furnished
-        if (excludeId) query = query.neq('public_id', excludeId); // tell Supabase to exclude this ID
+        if (furnished) query = query.ilike('description', `%${furnished}%`); 
+        if (excludeId) query = query.neq('public_id', excludeId); 
 
         // Apply Sorting
         switch (sort) {
@@ -68,8 +68,9 @@ export async function GET(request: Request) {
 
         if (error) throw error;
 
-        // 4. Format Response (Clean up images array and assign a cover_image)
-        const properties = data.map((prop: any) => {
+        // 4. Format Response (Safely fallback if data is null)
+        const safeData = data || [];
+        const properties = safeData.map((prop: any) => {
             const sortedImages = prop.property_images?.sort(
                 (a: any, b: any) => a.display_order - b.display_order
             ) || [];
@@ -104,7 +105,7 @@ export async function GET(request: Request) {
     } catch (error: any) {
         console.error("Properties API Error:", error);
         return NextResponse.json(
-            { success: false, error: 'Failed to fetch properties', details: error.message },
+            { success: false, error: 'Failed to fetch properties', details: error.message || error },
             { status: 500 }
         );
     }

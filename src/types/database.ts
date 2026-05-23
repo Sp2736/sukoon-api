@@ -70,6 +70,7 @@ export interface PropertyWithImages extends PropertyRow {
 // ── Insert / Update payloads ─────────────────────────────────
 
 export interface PropertyInsert {
+    public_id: string;
     title: string;
     description: string | null;
     price: number;
@@ -109,6 +110,7 @@ export type Database = {
                 Row: PropertyRow;
                 Insert: {
                     id?: string;
+                    public_id: string;
                     title: string;
                     description?: string | null;
                     price: number;
