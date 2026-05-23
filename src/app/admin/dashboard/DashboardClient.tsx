@@ -89,7 +89,7 @@ export default function DashboardClient({ properties }: { properties: any[] }) {
                 </div>
                 <Link
                     href="/admin/properties/new"
-                    className="w-full sm:w-auto bg-brand hover:bg-brand-dark text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center justify-center gap-2 md:gap-3 text-xs md:text-sm border border-brand-light/30"
+                    className="w-full sm:w-auto bg-brand hover:bg-brand-dark text-white px-6 md:px-6 py-3 md:py-2 rounded-xl font-bold shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center justify-center gap-2 md:gap-3 text-xs md:text-sm border border-brand-light/30"
                 >
                     <span className="text-lg md:text-xl font-light">+</span> Add New Listing
                 </Link>

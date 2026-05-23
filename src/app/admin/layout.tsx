@@ -11,8 +11,10 @@ export default async function AdminLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Authentication is handled by middleware.ts
-//   if (!user) return <>{children}</>;
+  // If there is no authenticated user, render the children directly (hides the sidebar on the login page)
+  if (!user) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col lg:flex-row font-sans text-stone-900">

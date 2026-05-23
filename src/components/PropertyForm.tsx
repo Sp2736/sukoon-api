@@ -301,7 +301,7 @@ export default function PropertyForm({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-brand text-white px-6 md:px-8 py-2.5 rounded-lg font-bold text-xs md:text-sm shadow-sm hover:bg-brand-light transition-colors disabled:opacity-50"
+                className="bg-brand text-white px-6 md:px-8 py-2.5 rounded-lg font-bold text-xs md:text-sm shadow-sm hover:bg-sky-700 transition-colors disabled:opacity-50"
               >
                 {isSubmitting ? "Saving..." : "Save Listing"}
               </button>
@@ -830,12 +830,12 @@ export default function PropertyForm({
             </div>
 
             {/* Modal Filter Strip */}
-            <div className="px-6 py-3 border-b border-stone-100 bg-stone-50 flex flex-wrap gap-2">
+            <div className="px-6 py-3 border-b border-stone-100 bg-sky-50 flex flex-wrap gap-2">
               <button
                 onClick={() => setModalCategoryFilter("All")}
                 className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-colors ${
                   modalCategoryFilter === "All"
-                    ? "bg-stone-800 text-white border-stone-800"
+                    ? "bg-sky-800 text-white border-stone-800"
                     : "bg-white text-stone-600 border-stone-200 hover:bg-stone-100"
                 }`}
               >
@@ -847,7 +847,7 @@ export default function PropertyForm({
                   onClick={() => setModalCategoryFilter(cat)}
                   className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-colors ${
                     modalCategoryFilter === cat
-                      ? "bg-stone-800 text-white border-stone-800"
+                      ? "bg-sky-800 text-white border-stone-800"
                       : "bg-white text-stone-600 border-stone-200 hover:bg-stone-100"
                   }`}
                 >
@@ -912,7 +912,7 @@ export default function PropertyForm({
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="bg-stone-800 hover:bg-stone-900 text-white px-8 py-2.5 rounded-lg font-bold text-sm shadow-sm transition-colors"
+                className="bg-sky-500 hover:bg-sky-700 text-white px-8 py-2.5 rounded-lg font-bold text-sm shadow-sm transition-colors"
               >
                 Done
               </button>

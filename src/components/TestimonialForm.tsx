@@ -57,7 +57,7 @@ export default function TestimonialForm() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="bg-brand text-white px-8 py-2.5 rounded-lg font-bold text-sm shadow-sm hover:bg-brand-light transition-colors disabled:opacity-50"
+                            className="bg-brand text-white px-8 py-2.5 rounded-lg font-bold text-sm shadow-sm hover:bg-sky-700 transition-colors disabled:opacity-50"
                         >
                             {isSubmitting ? "Saving..." : "Save Testimonial"}
                         </button>

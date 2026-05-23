@@ -22,7 +22,7 @@ export default async function TestimonialsPage() {
                 </div>
                 <Link
                     href="/admin/testimonials/new"
-                    className="w-full sm:w-auto bg-brand hover:bg-brand-light text-white px-6 py-3 rounded-lg font-bold shadow-sm transition-colors text-sm text-center"
+                    className="w-full sm:w-auto bg-brand hover:bg-sky-700 text-white px-6 py-3 rounded-lg font-bold shadow-sm transition-colors text-sm text-center"
                 >
                     + Add New Review
                 </Link>

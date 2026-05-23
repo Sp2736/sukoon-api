@@ -1,5 +1,5 @@
 'use client';
-// app/admin/login/page.tsx — Supabase Auth login (Client Component for form UX)
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -41,10 +41,10 @@ export default function AdminLoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white flex items-center justify-center px-4">
+        <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
             <div className="w-full max-w-md">
                 {/* Logo */}
-                <div className="flex flex-col items-center mb-12">
+                <div className="flex flex-col items-center mb-10">
                     <Image
                         src="/logo.svg"
                         alt="Sukoon Developer Logo"
@@ -56,15 +56,15 @@ export default function AdminLoginPage() {
                     <p className="text-stone-400 tracking-[0.3em] uppercase text-[10px] font-bold">Admin Portal</p>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-[0_20px_50px_rgba(14,165,233,0.1)] border border-stone-100 p-10">
-                    <h1 className="font-display text-3xl font-bold text-stone-800 mb-2">
+                <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 sm:p-10">
+                    <h1 className="font-display text-2xl sm:text-3xl font-bold text-stone-800 mb-2">
                         Welcome Back
                     </h1>
-                    <p className="text-stone-500 text-sm mb-10">Secure access to the Sukoon Admin Panel</p>
+                    <p className="text-stone-500 text-sm mb-8">Secure access to the Sukoon Admin Panel</p>
 
-                    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                         <div>
-                            <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">
+                            <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">
                                 Email Address
                             </label>
                             <input
@@ -74,12 +74,12 @@ export default function AdminLoginPage() {
                                 placeholder="admin@sukoon.com"
                                 required
                                 autoComplete="email"
-                                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[--color-brand] focus:border-transparent transition bg-stone-50"
+                                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-colors bg-stone-50 text-stone-900"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">
+                            <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">
                                 Password
                             </label>
                             <input
@@ -89,7 +89,7 @@ export default function AdminLoginPage() {
                                 placeholder="••••••••"
                                 required
                                 autoComplete="current-password"
-                                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[--color-brand] focus:border-transparent transition bg-stone-50"
+                                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-colors bg-stone-50 text-stone-900"
                             />
                         </div>
 
@@ -102,9 +102,9 @@ export default function AdminLoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-[--color-brand] text-white py-4 rounded-xl font-bold text-sm hover:bg-[--color-brand-dark] disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg shadow-sky-200"
+                            className="w-full bg-sky-500 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-sky-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors mt-2"
                         >
-                            {loading ? 'Signing in…' : 'Sign In to Dashboard'}
+                            {loading ? 'Signing in...' : 'Sign In'}
                         </button>
                     </form>
                 </div>

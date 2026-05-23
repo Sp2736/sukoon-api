@@ -9,7 +9,7 @@ interface Props {
     onFilesChange: (files: File[]) => void;
 }
 
-const MAX_FILES = 10;
+const MAX_FILES = 5;
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
 export default function ImageUpload({ files, onFilesChange }: Props) {
@@ -56,7 +56,7 @@ export default function ImageUpload({ files, onFilesChange }: Props) {
                     Click or drag images here
                 </p>
                 <p className="text-xs text-stone-400 mt-1">
-                    JPEG · PNG · WebP · AVIF — up to 5 MB each · max {MAX_FILES} images
+                    JPEG · PNG · WebP · AVIF — up to 2 MB each · max {MAX_FILES} images
                 </p>
             </div>
 

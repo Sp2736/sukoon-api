@@ -1,6 +1,16 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
+import { createClient } from "@/supabase/server";
 
-export default function AdminIndexPage() {
-  // Automatically redirect anyone visiting /admin to the dashboard
-  redirect('/admin/dashboard'); 
+export default async function AdminIndexPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Redirect based on the user's authentication status
+  if (user) {
+    redirect("/admin/dashboard");
+  } else {
+    redirect("/admin/login");
+  }
 }
