@@ -17,6 +17,7 @@ import type {
   PropertyImageRow,
   PropertyRow,
 } from "@/types/database";
+import AmenitySelector from "@/components/AmenitySelector";
 
 interface Props {
   mode: "create" | "edit";
@@ -189,6 +190,7 @@ export default function PropertyForm({
       fencing: property?.fencing ?? "",
       related_properties: property?.related_properties ?? [],
       is_published: property?.is_published ?? false,
+      amenities: property?.amenities || []
     },
   });
 
@@ -397,61 +399,22 @@ export default function PropertyForm({
               </div>
             </section>
 
-            {/* Section: Dynamic Specifications */}
+            {/* Section: Amenities & Facilities */}
             {selectedCategory && (
               <section className={cardCls}>
                 <h2 className="text-lg font-bold text-stone-900 mb-6 pb-4 border-b border-stone-100">
-                  {selectedCategory} Specifications
+                  Amenities & Facilities
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {selectedCategory === "Residential" && (
-                    <>
-                      <div>
-                        <label className={labelCls}>Configuration</label>
-                        <input
-                          {...register("configuration" as any)}
-                          className={inputCls()}
-                          placeholder="e.g. 3 BHK"
-                        />
-                      </div>
-                      <div>
-                        <label className={labelCls}>Floor No.</label>
-                        <input
-                          {...register("floor_number" as any)}
-                          className={inputCls()}
-                          placeholder="e.g. 5th"
-                        />
-                      </div>
-                    </>
-                  )}
-                  {(selectedCategory === "Agricultural Land" ||
-                    selectedCategory === "Non-agricultural Land") && (
-                    <>
-                      <div>
-                        <label className={labelCls}>Zone Type</label>
-                        <CustomSelect
-                          value={selectedZoneType || ""}
-                          onChange={(val) =>
-                            setValue("zone_type", val, { shouldValidate: true })
-                          }
-                          options={["Green Zone", "Yellow Zone"]}
-                          placeholder="Select zone..."
-                        />
-                      </div>
-                      <div>
-                        <label className={labelCls}>Fencing</label>
-                        <CustomSelect
-                          value={selectedFencing || ""}
-                          onChange={(val) =>
-                            setValue("fencing", val, { shouldValidate: true })
-                          }
-                          options={["Yes", "No"]}
-                          placeholder="Select..."
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
+                <AmenitySelector
+                  category={selectedCategory}
+                  selectedAmenities={watch("amenities") || []}
+                  onChange={(val) =>
+                    setValue("amenities", val, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                />
               </section>
             )}
 
@@ -618,6 +581,65 @@ export default function PropertyForm({
 
           {/* RIGHT COLUMN (Narrower) - Location & Relations */}
           <div className="lg:col-span-4 space-y-8">
+            
+            {/* Section: Dynamic Specifications */}
+            {selectedCategory && (
+              <section className={cardCls}>
+                <h2 className="text-lg font-bold text-stone-900 mb-6 pb-4 border-b border-stone-100">
+                  {selectedCategory} Specifications
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedCategory === "Residential" && (
+                    <>
+                      <div>
+                        <label className={labelCls}>Configuration</label>
+                        <input
+                          {...register("configuration" as any)}
+                          className={inputCls()}
+                          placeholder="e.g. 3 BHK"
+                        />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Floor No.</label>
+                        <input
+                          {...register("floor_number" as any)}
+                          className={inputCls()}
+                          placeholder="e.g. 5th"
+                        />
+                      </div>
+                    </>
+                  )}
+                  {(selectedCategory === "Agricultural Land" ||
+                    selectedCategory === "Non-agricultural Land") && (
+                    <>
+                      <div>
+                        <label className={labelCls}>Zone Type</label>
+                        <CustomSelect
+                          value={selectedZoneType || ""}
+                          onChange={(val) =>
+                            setValue("zone_type", val, { shouldValidate: true })
+                          }
+                          options={["Green Zone", "Yellow Zone"]}
+                          placeholder="Select zone..."
+                        />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Fencing</label>
+                        <CustomSelect
+                          value={selectedFencing || ""}
+                          onChange={(val) =>
+                            setValue("fencing", val, { shouldValidate: true })
+                          }
+                          options={["Yes", "No"]}
+                          placeholder="Select..."
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </section>
+            )}
+
             {/* Section: Location */}
             <section className={cardCls}>
               <h2 className="text-lg font-bold text-stone-900 mb-6 pb-4 border-b border-stone-100">

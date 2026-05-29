@@ -1,5 +1,7 @@
 import { getTransactionsAdmin } from "@/lib/actions";
-import TransactionForm from "@/components/TransactionForm";
+import TransactionForm, {
+  CreditWithRemaining,
+} from "@/components/TransactionForm";
 import DeleteTransactionButton from "@/components/DeleteTransactionButton";
 import type { Metadata } from "next";
 import { Info } from "lucide-react";
@@ -16,15 +18,27 @@ export default async function AccountsPage(props: Props) {
   const searchParams = await props.searchParams;
   const transactions = (await getTransactionsAdmin()) as TransactionRow[];
 
-  const totalCredit = transactions
-    .filter((t: TransactionRow) => t.type === "credit")
-    .reduce((sum: number, t: TransactionRow) => sum + Number(t.amount), 0);
+  // Split and calculate remaining balances for credits mapping
+  const credits = transactions.filter((t) => t.type === "credit");
+  const debits = transactions.filter((t) => t.type === "debit");
 
-  const totalDebit = transactions
-    .filter((t: TransactionRow) => t.type === "debit")
-    .reduce((sum: number, t: TransactionRow) => sum + Number(t.amount), 0);
-
+  const totalCredit = credits.reduce((sum, t) => sum + Number(t.amount), 0);
+  const totalDebit = debits.reduce((sum, t) => sum + Number(t.amount), 0);
   const balance = totalCredit - totalDebit;
+
+  // Calculate available credits with remaining balances greater than 0
+  const availableCredits: CreditWithRemaining[] = credits
+    .map((credit) => {
+      const usedAmount = debits
+        .filter((d) => d.linked_credit_id === credit.id)
+        .reduce((sum, d) => sum + Number(d.amount), 0);
+
+      return {
+        ...credit,
+        remaining: Number(credit.amount) - usedAmount,
+      };
+    })
+    .filter((c) => c.remaining > 0);
 
   // Pagination Logic
   const currentPage = Number(searchParams?.page) || 1;
@@ -74,7 +88,7 @@ export default async function AccountsPage(props: Props) {
         </div>
       </div>
 
-      {/* KPIs - Responsive Grid */}
+      {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((s) => (
           <div
@@ -97,7 +111,6 @@ export default async function AccountsPage(props: Props) {
                 {s.icon}
               </span>
             </div>
-            {/* Subtle Background Pattern */}
             <div className="absolute -bottom-2 -right-2 text-6xl md:text-8xl opacity-[0.03] select-none pointer-events-none group-hover:rotate-12 transition-transform duration-700">
               {s.icon}
             </div>
@@ -106,9 +119,9 @@ export default async function AccountsPage(props: Props) {
       </div>
 
       <div className="grid grid-cols-12 gap-6 md:gap-10">
-        {/* Left: Add New Entry */}
-        <div className="col-span-12 lg:col-span-4 order-2 lg:order-1">
-          <TransactionForm />
+        {/* Left: Add New Entry - Now Receives Available Credits */}
+        <div className="col-span-12 lg:col-span-4 order-2 lg:order-1 h-full">
+          <TransactionForm availableCredits={availableCredits} />
         </div>
 
         {/* Right: History */}
@@ -136,69 +149,92 @@ export default async function AccountsPage(props: Props) {
             ) : (
               <>
                 <div className="overflow-x-auto scrollbar-hide flex-1">
-                  <table className="w-full text-left border-collapse min-w-[600px]">
+                  <table className="w-full text-left border-collapse min-w-[650px]">
                     <thead>
                       <tr className="text-[10px] font-black text-stone-400 uppercase tracking-widest border-b border-stone-100 bg-stone-50/50">
                         <th className="px-6 py-4">Date</th>
                         <th className="px-6 py-4">Description</th>
+                        <th className="px-6 py-4">Source / Fund Link</th>
                         <th className="px-6 py-4">Amount</th>
                         <th className="px-6 py-4 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-50">
-                      {paginatedTransactions.map((t) => (
-                        <tr
-                          key={t.id}
-                          className="hover:bg-sky-50/30 transition-colors group"
-                        >
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <span className="text-xs font-bold text-stone-500">
-                              {new Date(t.date).toLocaleDateString("en-IN", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
-                            </span>
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="flex items-center gap-3">
-                              <div
-                                className={`w-2 h-2 rounded-full ${t.type === "credit" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]"}`}
-                              ></div>
-                              <span className="text-sm font-bold text-stone-800">
-                                {t.title.length > 30
-                                  ? t.title.slice(0, 30) + "..."
-                                  : t.title}
+                      {paginatedTransactions.map((t) => {
+                        // Find linked credit info if it's a debit
+                        const linkedCredit =
+                          t.type === "debit" && t.linked_credit_id
+                            ? credits.find((c) => c.id === t.linked_credit_id)
+                            : null;
+
+                        return (
+                          <tr
+                            key={t.id}
+                            className="hover:bg-sky-50/30 transition-colors group"
+                          >
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <span className="text-xs font-bold text-stone-500">
+                                {new Date(t.date).toLocaleDateString("en-IN", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })}
                               </span>
-                              {t.title.length > 30 && (
-                                <div className="relative group/tip">
-                                  <Info
-                                    size={15}
-                                    className="text-stone-400 hover:text-stone-600 cursor-pointer transition-colors flex-shrink-0"
-                                  />
-                                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/tip:block z-50 w-max max-w-xs">
-                                    <div className="bg-stone-800 text-white text-xs rounded-md px-3 py-2 shadow-lg font-medium leading-relaxed">
-                                      {t.title}
+                            </td>
+                            <td className="px-6 py-5">
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={`w-2 h-2 rounded-full flex-shrink-0 ${t.type === "credit" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]"}`}
+                                ></div>
+                                <span className="text-sm font-bold text-stone-800">
+                                  {t.title.length > 30
+                                    ? t.title.slice(0, 30) + "..."
+                                    : t.title}
+                                </span>
+                                {t.title.length > 30 && (
+                                  <div className="relative group/tip">
+                                    <Info
+                                      size={15}
+                                      className="text-stone-400 hover:text-stone-600 cursor-pointer transition-colors flex-shrink-0"
+                                    />
+                                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/tip:block z-50 w-max max-w-xs">
+                                      <div className="bg-stone-800 text-white text-xs rounded-md px-3 py-2 shadow-lg font-medium leading-relaxed">
+                                        {t.title}
+                                      </div>
+                                      <div className="w-2 h-2 bg-stone-800 rotate-45 mx-auto -mt-1"></div>
                                     </div>
-                                    <div className="w-2 h-2 bg-stone-800 rotate-45 mx-auto -mt-1"></div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <span
-                              className={`text-sm font-black ${t.type === "credit" ? "text-emerald-600" : "text-red-600"}`}
-                            >
-                              {t.type === "credit" ? "+ ₹" : "- ₹"}{" "}
-                              {Number(t.amount).toLocaleString("en-IN")}
-                            </span>
-                          </td>
-                          <td className="px-6 py-5 text-right">
-                            <DeleteTransactionButton id={t.id} />
-                          </td>
-                        </tr>
-                      ))}
+                                )}
+                              </div>
+                            </td>
+
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <div className="flex flex-col gap-1">
+                                <span className="text-sm font-semibold text-stone-700 capitalize">
+                                  {t.source || "N/A"}
+                                </span>
+                                {linkedCredit && (
+                                  <span className="text-[10px] font-bold text-[#0ea5e9] bg-sky-50 px-2 py-0.5 rounded-sm inline-flex w-fit">
+                                    Fund: {linkedCredit.title}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <span
+                                className={`text-sm font-black ${t.type === "credit" ? "text-emerald-600" : "text-red-600"}`}
+                              >
+                                {t.type === "credit" ? "+ ₹" : "- ₹"}{" "}
+                                {Number(t.amount).toLocaleString("en-IN")}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 text-right">
+                              <DeleteTransactionButton id={t.id} />
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
