@@ -122,6 +122,7 @@ export const workSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   location: z.string().min(1, 'Location is required'),
   status: z.string().min(1, 'Status is required'),
+  description: z.string().optional(),
 });
 
 export type WorkFormValues = z.infer<typeof workSchema>;

@@ -109,7 +109,7 @@ export default function WorkForm() {
         if (file.type.startsWith("image/")) {
           fileToUpload = await compressImageToWebP(file);
         } else if (file.type.startsWith("video/")) {
-          // Restrict video size to 50MB (adjustable) to save Supabase space
+          // Restrict video size to 50MB
           const maxVideoSize = 50 * 1024 * 1024;
           if (file.size > maxVideoSize) {
             throw new Error(`Video ${file.name} exceeds the 50MB limit. Please compress it first.`);
@@ -136,22 +136,11 @@ export default function WorkForm() {
         });
       }
 
-    //   const { error: dbError } = await supabase.from("works").insert({
-    //     ...data,
-    //     media: uploadedMedia,
-    //   });
-
-    //   if (dbError) throw dbError;
-
-    //   reset();
-    //   setFiles([]);
-
-    const payload = {
+      const payload = {
         ...data,
         media: uploadedMedia,
       };
 
-      // Cast to 'any' to bypass strict table inference if the DB types aren't fully synced yet
       const { error: dbError } = await supabase.from("works").insert(payload as any);
 
       if (dbError) throw dbError;
@@ -216,6 +205,18 @@ export default function WorkForm() {
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
+        </div>
+
+        {/* New Description Field spanning both columns */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-bold text-stone-700 mb-2">Description (Optional)</label>
+          <textarea
+            {...register("description")}
+            rows={4}
+            className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl outline-none focus:border-[#0ea5e9] focus:ring-1 focus:ring-[#0ea5e9] transition-all resize-none"
+            placeholder="Add specific details, project highlights, or an overview..."
+          />
+          {errors.description && <p className="text-red-500 text-xs mt-1 font-semibold">{errors.description.message}</p>}
         </div>
       </div>
 

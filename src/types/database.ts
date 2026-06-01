@@ -19,6 +19,7 @@ export interface WorkRow {
   status: string;
   media: WorkMedia[];
   created_at: string;
+  description?: string | null;
 }
 
 export interface WorkInsert {
@@ -27,6 +28,7 @@ export interface WorkInsert {
   location: string;
   status: string;
   media: WorkMedia[];
+  description?: string | null;
 }
 
 export type WorkUpdate = Partial<WorkInsert>;
@@ -83,7 +85,7 @@ export interface TransactionRow {
   amount: number;
   date: string;
   created_at: string;
-  linked_credit_id?: string | null; // <-- NEW
+  linked_credit_id?: string | null;
 }
 
 export interface ReviewRow {
