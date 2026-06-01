@@ -116,3 +116,12 @@ export const reviewSchema = z.object({
 });
 
 export type ReviewFormValues = z.infer<typeof reviewSchema>;
+
+export const workSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  category: z.string().min(1, 'Category is required'),
+  location: z.string().min(1, 'Location is required'),
+  status: z.string().min(1, 'Status is required'),
+});
+
+export type WorkFormValues = z.infer<typeof workSchema>;

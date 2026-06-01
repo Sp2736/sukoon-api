@@ -5,6 +5,32 @@ export type PropertyCategory =
   | "Agricultural Land"
   | "Non-agricultural Land";
 
+export interface WorkMedia {
+  url: string;
+  type: "image" | "video";
+  path?: string;
+}
+
+export interface WorkRow {
+  id: string;
+  title: string;
+  category: string;
+  location: string;
+  status: string;
+  media: WorkMedia[];
+  created_at: string;
+}
+
+export interface WorkInsert {
+  title: string;
+  category: string;
+  location: string;
+  status: string;
+  media: WorkMedia[];
+}
+
+export type WorkUpdate = Partial<WorkInsert>;
+
 export interface PropertyRow {
   id: string;
   public_id: string;
@@ -114,6 +140,12 @@ export interface InquiryInsert {
 export type Database = {
   public: {
     Tables: {
+      works: {
+        Row: WorkRow;
+        Insert: WorkInsert;
+        Update: WorkUpdate;
+        Relationships: [];
+      };
       properties: {
         Row: PropertyRow;
         Insert: {
