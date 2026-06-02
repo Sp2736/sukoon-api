@@ -21,44 +21,6 @@ const AMENITIES_MAP: Record<string, string[]> = {
     "Intercom",
     "Maintenance Staff",
   ],
-  Industrial: [
-    "Power Backup",
-    "Loading Dock",
-    "High Ceiling",
-    "Security",
-    "Heavy Vehicle Access",
-    "Waste Disposal",
-    "Fire Safety",
-    "Water Tank",
-  ],
-  Commercial: [
-    "High Speed Internet",
-    "Conference Room",
-    "Security",
-    "Power Backup",
-    "Elevator",
-    "Parking",
-    "Central AC",
-    "Fire Safety",
-    "CCTV Surveillance",
-    "Reception Area",
-  ],
-  "Agricultural Land": [
-    "Water Borewell",
-    "Fencing",
-    "Road Access",
-    "Drip Irrigation",
-    "Electricity Connection",
-    "Farmhouse Facility",
-  ],
-  "Non-agricultural Land": [
-    "Electricity Connection",
-    "Water Supply",
-    "Fencing",
-    "Drainage",
-    "Compound Wall",
-    "Street Lighting",
-  ],
 };
 
 export default function AmenitySelector({
@@ -76,18 +38,17 @@ export default function AmenitySelector({
     }
   };
 
-  if (availableAmenities.length === 0) {
+  if (category !== "Residential" || availableAmenities.length === 0) {
     return (
       <div className="text-center py-8 bg-stone-50 rounded-lg border border-stone-200 border-dashed">
         <p className="text-sm text-stone-500 font-medium">
-          No standard amenities defined for this category.
+          Amenities are currently only available for the Residential category.
         </p>
       </div>
     );
   }
 
   return (
-    // max-h restricts view to ~4 rows, forcing scroll if it overflows
     <div className="max-h-[220px] md:max-h-[240px] overflow-y-auto custom-scrollbar pr-2">
       <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
         {availableAmenities.map((amenity) => {

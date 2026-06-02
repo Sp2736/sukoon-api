@@ -190,7 +190,7 @@ export default function PropertyForm({
       fencing: property?.fencing ?? "",
       related_properties: property?.related_properties ?? [],
       is_published: property?.is_published ?? false,
-      amenities: property?.amenities || []
+      amenities: property?.amenities || [],
     },
   });
 
@@ -400,7 +400,7 @@ export default function PropertyForm({
             </section>
 
             {/* Section: Amenities & Facilities */}
-            {selectedCategory && (
+            {selectedCategory === "Residential" && (
               <section className={cardCls}>
                 <h2 className="text-lg font-bold text-stone-900 mb-6 pb-4 border-b border-stone-100">
                   Amenities & Facilities
@@ -581,7 +581,6 @@ export default function PropertyForm({
 
           {/* RIGHT COLUMN (Narrower) - Location & Relations */}
           <div className="lg:col-span-4 space-y-8">
-            
             {/* Section: Dynamic Specifications */}
             {selectedCategory && (
               <section className={cardCls}>

@@ -141,7 +141,7 @@ export default function TransactionForm({ availableCredits = [] }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-1.5 ml-1">
-            Title / Description
+            Title
           </label>
           <input
             {...register("title")}
@@ -161,7 +161,7 @@ export default function TransactionForm({ availableCredits = [] }: Props) {
 
         <div>
           <label className="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-1.5 ml-1">
-            Source / Individual
+            Individual
           </label>
           {activeType === "credit" ? (
             <input

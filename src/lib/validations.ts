@@ -40,7 +40,7 @@ export const propertySchema = z.object({
       message: "Select a valid category",
     },
   ),
-  amenities: z.array(z.string()).default([]),
+  amenities: z.array(z.string()).optional().default([]),
   configuration: z.string().max(100).optional().or(z.literal("")),
   floor_number: z.string().max(50).optional().or(z.literal("")),
   room_size: z.string().max(100).optional().or(z.literal("")),
@@ -118,10 +118,10 @@ export const reviewSchema = z.object({
 export type ReviewFormValues = z.infer<typeof reviewSchema>;
 
 export const workSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  category: z.string().min(1, 'Category is required'),
-  location: z.string().min(1, 'Location is required'),
-  status: z.string().min(1, 'Status is required'),
+  title: z.string().min(1, "Title is required"),
+  category: z.string().min(1, "Category is required"),
+  location: z.string().min(1, "Location is required"),
+  status: z.string().min(1, "Status is required"),
   description: z.string().optional(),
 });
 
