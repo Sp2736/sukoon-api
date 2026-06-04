@@ -541,6 +541,8 @@ export default function PropertyForm({
                           </div>
                         </div>
                       ))}
+
+                      {/* Mapping through Pending Uploads */}
                       {pendingFiles
                         .slice(existingImages.length > 0 ? 0 : 1)
                         .map((file, idx) => {
@@ -556,7 +558,24 @@ export default function PropertyForm({
                                 className="w-full h-full object-cover opacity-70"
                                 alt="Pending"
                               />
-                              <div className="absolute inset-0 bg-stone-900/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
+                              
+                              {/* Hover Overlay - Now with flex-col to stack buttons */}
+                              <div className="absolute inset-0 bg-stone-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
+                                
+                                {/* NEW: Make Cover Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newArr = [...pendingFiles];
+                                    const selected = newArr.splice(originalIdx, 1)[0];
+                                    setPendingFiles([selected, ...newArr]);
+                                  }}
+                                  className="text-[10px] font-bold text-white bg-stone-700 hover:bg-stone-600 px-3 py-1.5 rounded w-full"
+                                >
+                                  Make Cover
+                                </button>
+
+                                {/* EXISTING: Remove Button */}
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -564,10 +583,11 @@ export default function PropertyForm({
                                     newArr.splice(originalIdx, 1);
                                     setPendingFiles(newArr);
                                   }}
-                                  className="text-[10px] font-bold text-white bg-red-600 px-3 py-1.5 rounded"
+                                  className="text-[10px] font-bold text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded w-full"
                                 >
                                   Remove
                                 </button>
+                                
                               </div>
                             </div>
                           );

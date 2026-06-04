@@ -14,6 +14,28 @@ interface PropertyCardProps {
   index?: number;
 }
 
+// Map dynamic amenity names to their respective icons
+const AMENITY_ICONS: Record<string, string> = {
+  "Prime Location": "/amenities-prime.png",
+  "Schools Nearby": "/amenities-school.png",
+  "Hospitals Nearby": "/amenities-hospital.png",
+  "Gymnasium": "/amenities-gym.webp",
+  "Swimming Pool": "/amenities-pool.webp",
+  "Clubhouse": "/amenities-clubhouse.webp",
+  "Children Park": "/amenities-park.webp",
+  "Living Room": "/amenities-living.webp",
+  "Power Backup": "/amenities-power.webp",
+  "Dining Area": "/amenities-dining.webp",
+  "Security": "/amenities-security.webp",
+  "Parking": "/amenities-parking.webp",
+  "Intercom": "/amenities-intercom.webp",
+  "Maintenance Staff": "/amenities-staff.webp",
+};
+
+// Fallback icon for any newly added amenities that don't have a specific icon yet
+const getAmenityIcon = (name: string) =>
+  AMENITY_ICONS[name] || "/verified-check.webp";
+
 export default function PropertyCard({
   id,
   image,
@@ -89,10 +111,14 @@ export default function PropertyCard({
               </div>
             ))}
 
-            {/* Render Admin-selected Amenities next */}
+            {/* Render Admin-selected Amenities next (Now mapped to Images) */}
             {amenities.slice(0, 2).map((amenity, idx) => (
               <div key={`admin-${idx}`} className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-md">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full shrink-0"></div>
+                <img 
+                  src={getAmenityIcon(amenity)} 
+                  alt={amenity} 
+                  className="w-3.5 h-3.5 object-contain opacity-70"
+                />
                 <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
                   {amenity}
                 </span>
@@ -114,7 +140,7 @@ export default function PropertyCard({
           </span>
 
           <Link
-            href={`/admin/properties/${id}/edit`} // Adjusted link for admin dashboard to go to edit screen
+            href={`/admin/properties/${id}/edit`} 
             className="flex items-center gap-1 text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors"
           >
             Edit Details <ArrowRight className="w-4 h-4" />

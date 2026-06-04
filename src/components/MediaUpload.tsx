@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
+import { Trash2, Star } from "lucide-react";
 
 interface Props {
     files: File[];
@@ -14,12 +15,18 @@ export default function MediaUpload({ files, onFilesChange }: Props) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [error, setError] = useState<string | null>(null);
 
+    const handleSetAsCover = (indexToMove: number) => {
+        const updatedFiles = [...files];
+        const [coverFile] = updatedFiles.splice(indexToMove, 1);
+        updatedFiles.unshift(coverFile);
+        onFilesChange(updatedFiles);
+    };
+
     const addFiles = useCallback(
         (incoming: FileList | null) => {
             if (!incoming) return;
             const newFiles = Array.from(incoming).filter((f) => ALLOWED.includes(f.type));
             
-            // Check constraints: max 1 video total
             let videoCount = files.filter(f => f.type.startsWith('video/')).length;
             
             const validFiles: File[] = [];
@@ -81,9 +88,14 @@ export default function MediaUpload({ files, onFilesChange }: Props) {
             {error && <p className="text-red-500 text-xs font-semibold">{error}</p>}
 
             {files.length > 0 && (
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                     {files.map((file, i) => (
-                        <div key={i} className="relative group aspect-square bg-stone-100 rounded-lg border border-stone-200 overflow-hidden">
+                        <div 
+                            key={i} 
+                            className={`relative aspect-square bg-stone-100 rounded-xl overflow-hidden border-2 transition-all ${
+                                i === 0 ? "border-[#52B7EC] shadow-md" : "border-stone-200"
+                            }`}
+                        >
                             {file.type.startsWith('video/') ? (
                                 <video
                                     src={URL.createObjectURL(file)}
@@ -97,14 +109,48 @@ export default function MediaUpload({ files, onFilesChange }: Props) {
                                     className="w-full h-full object-cover"
                                 />
                             )}
-                            <button
-                                type="button"
-                                onClick={() => removeFile(i)}
-                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                            >
-                                ×
-                            </button>
-                            <div className="absolute inset-x-0 bottom-0 bg-black/50 text-white text-[10px] px-1 py-0.5 z-10 truncate">
+
+                            {/* Top Left: Cover Image Badge */}
+                            {i === 0 && !file.type.startsWith('video/') && (
+                                <span className="absolute top-2 left-2 bg-[#52B7EC] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10 pointer-events-none">
+                                    Cover
+                                </span>
+                            )}
+
+                            {/* Top Right: Always-Visible Action Buttons */}
+                            <div className="absolute top-2 right-2 flex flex-col gap-1.5 z-20">
+                                
+                                {/* Delete Button */}
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        removeFile(i);
+                                    }}
+                                    className="p-1.5 bg-red-500/90 hover:bg-red-600 text-white rounded-md shadow-sm backdrop-blur-sm transition-colors"
+                                    title="Delete File"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+
+                                {/* Set as Cover Button (Only for images, not videos, and not the 1st item) */}
+                                {i !== 0 && !file.type.startsWith('video/') && (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleSetAsCover(i);
+                                        }}
+                                        className="p-1.5 bg-white/90 hover:bg-white text-stone-700 hover:text-[#52B7EC] rounded-md shadow-sm backdrop-blur-sm transition-colors border border-stone-200/50"
+                                        title="Set as Cover Image"
+                                    >
+                                        <Star className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Bottom: Filename */}
+                            <div className="absolute inset-x-0 bottom-0 bg-black/60 text-white text-[10px] px-2 py-1 z-10 truncate pointer-events-none">
                                 {file.name}
                             </div>
                         </div>

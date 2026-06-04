@@ -371,3 +371,29 @@ export async function deleteReviewAction(id: string) {
   revalidatePath("/admin/testimonials");
   return { success: true };
 }
+
+// ════════════════════════════════════════════════════════════
+// WORKS
+// ════════════════════════════════════════════════════════════
+
+export async function deleteWorkAction(id: string) {
+  const supabase = await createServiceClient();
+
+  // 1. Delete all media from the storage bucket
+  const { data: files } = await supabase.storage.from("works").list(id);
+  if (files && files.length > 0) {
+    const paths = files.map((file) => `${id}/${file.name}`);
+    await supabase.storage.from("works").remove(paths);
+  }
+
+  // 2. Delete the DB record
+  const { error } = await (supabase.from("works") as any)
+    .delete()
+    .eq("id", id);
+  if (error) return toActionError(error);
+
+  revalidatePath("/admin/works");
+  revalidatePath("/works"); // assuming public works route
+  revalidatePath("/");
+  return { success: true };
+}

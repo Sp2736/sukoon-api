@@ -1,6 +1,7 @@
 import { createClient } from "@/supabase/server";
 import WorkForm from "@/components/WorkForm";
 import type { WorkRow } from "@/types/database";
+import DeleteWorkButton from "@/components/DeleteWorkButton";
 
 export default async function WorksPage() {
   const supabase = await createClient();
@@ -14,7 +15,6 @@ export default async function WorksPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-10 space-y-8 md:space-y-12">
-      
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-stone-200 pb-8">
         <div>
@@ -41,10 +41,12 @@ export default async function WorksPage() {
       {/* Existing Works Grid Section */}
       <div>
         <div className="flex items-center justify-between mb-6 border-b border-stone-100 pb-4">
-            <h2 className="text-lg font-black text-stone-800">Portfolio Gallery</h2>
-            <span className="text-xs font-bold text-stone-400 uppercase tracking-widest bg-stone-100 px-3 py-1 rounded-full">
-                {works?.length || 0} Projects
-            </span>
+          <h2 className="text-lg font-black text-stone-800">
+            Portfolio Gallery
+          </h2>
+          <span className="text-xs font-bold text-stone-400 uppercase tracking-widest bg-stone-100 px-3 py-1 rounded-full">
+            {works?.length || 0} Projects
+          </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -68,13 +70,16 @@ export default async function WorksPage() {
                 )}
               </div>
               <div className="p-5 flex-1 flex flex-col">
-                <div className="flex gap-2 mb-3 flex-wrap">
-                  <span className="text-[10px] uppercase font-black tracking-widest bg-stone-100 px-2.5 py-1 rounded-sm text-stone-600">
-                    {work.category}
-                  </span>
-                  <span className="text-[10px] uppercase font-black tracking-widest bg-sky-50 px-2.5 py-1 rounded-sm text-sky-600">
-                    {work.status}
-                  </span>
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex gap-2 mb-3 flex-col">
+                    <div className="text-[10px] uppercase font-black tracking-widest bg-stone-100 px-2.5 py-1 rounded-sm text-stone-600">
+                      {work.category}
+                    </div>
+                    <div className="text-[10px] uppercase font-black tracking-widest bg-sky-50 px-2.5 py-1 rounded-sm text-sky-600">
+                      {work.status}
+                    </div>
+                  </div>
+                  <DeleteWorkButton id={work.id} title={work.title} />
                 </div>
                 <h3 className="font-bold text-lg text-stone-800 leading-tight mb-1">
                   {work.title}
@@ -93,7 +98,8 @@ export default async function WorksPage() {
                 No Works Added
               </h3>
               <p className="text-stone-500 text-sm mt-1">
-                Fill the form above to add your first completed or ongoing project.
+                Fill the form above to add your first completed or ongoing
+                project.
               </p>
             </div>
           )}

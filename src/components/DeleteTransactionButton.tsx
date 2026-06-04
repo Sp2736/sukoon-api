@@ -26,7 +26,7 @@ export default function DeleteTransactionButton({ id }: { id: string }) {
         <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-stone-300 hover:text-red-500 transition-colors disabled:opacity-30"
+            className="text-stone-300 hover:text-red-500 transition-colors disabled:opacity-30 cursor-pointer"
             title="Delete transaction"
         >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
