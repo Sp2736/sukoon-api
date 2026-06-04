@@ -379,21 +379,41 @@ export async function deleteReviewAction(id: string) {
 export async function deleteWorkAction(id: string) {
   const supabase = await createServiceClient();
 
-  // 1. Delete all media from the storage bucket
-  const { data: files } = await supabase.storage.from("works").list(id);
-  if (files && files.length > 0) {
-    const paths = files.map((file) => `${id}/${file.name}`);
-    await supabase.storage.from("works").remove(paths);
+  // 1. Fetch the work to get its associated media paths
+  const { data: work, error: fetchError } = await (supabase.from("works") as any)
+    .select("media")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) return toActionError(fetchError);
+
+  // 2. Delete all media from the storage bucket
+  if (work?.media && Array.isArray(work.media) && work.media.length > 0) {
+    // Extract the 'path' property from each media object
+    const pathsToRemove = work.media
+      .map((item: any) => item.path)
+      .filter(Boolean); // Ensure we don't pass undefined/null paths
+
+    if (pathsToRemove.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from("works")
+        .remove(pathsToRemove);
+        
+      if (storageError) {
+        console.error("Failed to delete some works media:", storageError);
+      }
+    }
   }
 
-  // 2. Delete the DB record
+  // 3. Delete the DB record
   const { error } = await (supabase.from("works") as any)
     .delete()
     .eq("id", id);
+    
   if (error) return toActionError(error);
 
   revalidatePath("/admin/works");
-  revalidatePath("/works"); // assuming public works route
+  revalidatePath("/works"); 
   revalidatePath("/");
   return { success: true };
 }
